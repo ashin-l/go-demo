@@ -1,7 +1,8 @@
 #!/bin/bash
 
-source ./.env
-
-echo $MY_DB_HOST
+while IFS='=' read -r key val
+do
+    export "$key"="$val"
+done < .env
 
 ./util

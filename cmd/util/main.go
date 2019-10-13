@@ -13,7 +13,7 @@ const (
 	defTLS      = "false"
 	defDBHost   = "localhost"
 	defDBPort   = "5432"
-	defNum      = "37"
+	defNum      = "0"
 
 	envLogLevel = "MY_LOG_LEVEL"
 	envTLS      = "MY_TLS"
