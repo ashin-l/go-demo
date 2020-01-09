@@ -9,72 +9,87 @@ import (
 )
 
 const (
-	NORMAL  = 0
-	LATE    = 1
-	LEAVE   = 2
-	ABSENCE = 3
+	_ int = iota
+	ABSENCE
+	NORMAL
+	LATE
+	LEAVE
+	OVERTM
 )
 
 const (
-	START = 1572567621
-	END   = 1572600201
-	DAYS  = 27
+	START = 1574641380
+	END   = 1574673780
+	DAYS  = 32
 )
 
 type Employee struct {
-	EmpID string
-	DepID string
+	EmpId string
+	DepId int
+	Name  string
 }
 
 type Attendance struct {
 	Day       string
-	EmpID     string `gorm:"column:EmpID"`
-	DepID     string `gorm:"column:DepID"`
-	StartTime string `gorm:"column:StartTime"`
-	EndTime   string `gorm:"column:EndTime"`
+	EmpId     string
+	DepId     int
+	Name      string
+	StartTime int64
+	EndTime   int64
 	Status    int
 }
 
 func main() {
-	db, err := gorm.Open("mysql", "root:1234.Com@tcp(192.168.152.181:3306)/tianhe")
+	db, err := gorm.Open("mysql", "root:1234.Com@tcp(192.168.152.182:3306)/smart_park")
 	if err != nil {
 		panic("failed to connect database")
 	}
 	defer db.Close()
 
-	rows, err := db.Raw("select EmpID, DepID from employee").Rows() // (*sql.Rows, error)
+	rows, err := db.Raw("select emp_id, dep_id, name from cfg_employee").Rows() // (*sql.Rows, error)
 	defer rows.Close()
 	emps := []Employee{}
 	for rows.Next() {
 		tmp := Employee{}
-		rows.Scan(&tmp.EmpID, &tmp.DepID)
+		rows.Scan(&tmp.EmpId, &tmp.DepId, &tmp.Name)
 		emps = append(emps, tmp)
 	}
 	data := []Attendance{}
 	for i := 0; i != DAYS; i++ {
 		start := int64(START + 24*60*60*i)
 		end := int64(END + 24*60*60*i)
+		dt := time.Unix(start, 0)
+		if dt.Weekday() == time.Saturday || dt.Weekday() == time.Sunday {
+			continue
+		}
 		day := time.Unix(start, 0).Format("2006-01-02")
 		for _, v := range emps {
 			ad := Attendance{
-				EmpID: v.EmpID,
-				DepID: v.DepID,
+				EmpId: v.EmpId,
+				DepId: v.DepId,
 				Day:   day,
+				Name:  v.Name,
 			}
 			r := rand.Intn(10)
 			if r == 7 {
 				ad.Status = ABSENCE
 			} else if r == 3 {
-				ad.StartTime = time.Unix(start+3600, 0).Format("2006-01-02 15:04:05")
-				ad.EndTime = time.Unix(end, 0).Format("2006-01-02 15:04:05")
+				ad.StartTime = (start + 3600) * 1000
+				ad.EndTime = end * 1000
+				//ad.StartTime = time.Unix(start+3600, 0).Format("2006-01-02 15:04:05")
+				//ad.EndTime = time.Unix(end, 0).Format("2006-01-02 15:04:05")
 				ad.Status = LATE
 			} else if r == 1 {
-				ad.StartTime = time.Unix(start, 0).Format("2006-01-02 15:04:05")
-				ad.EndTime = time.Unix(end-3600, 0).Format("2006-01-02 15:04:05")
+				ad.StartTime = start * 1000
+				ad.EndTime = (end - 3600) * 1000
+				//ad.StartTime = time.Unix(start, 0).Format("2006-01-02 15:04:05")
+				//ad.EndTime = time.Unix(end-3600, 0).Format("2006-01-02 15:04:05")
 				ad.Status = LEAVE
 			} else {
-				ad.StartTime = time.Unix(start, 0).Format("2006-01-02 15:04:05")
-				ad.EndTime = time.Unix(end, 0).Format("2006-01-02 15:04:05")
+				ad.StartTime = start * 1000
+				ad.EndTime = end * 1000
+				//ad.StartTime = time.Unix(start, 0).Format("2006-01-02 15:04:05")
+				//ad.EndTime = time.Unix(end, 0).Format("2006-01-02 15:04:05")
 				ad.Status = NORMAL
 			}
 			data = append(data, ad)
@@ -89,7 +104,7 @@ func main() {
 	}()
 
 	for _, v := range data {
-		if err := tx.Table("attendance").Create(&v).Error; err != nil {
+		if err := tx.Table("sdr_attendance_statistics").Create(&v).Error; err != nil {
 			tx.Rollback()
 			return
 		}
