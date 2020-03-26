@@ -17,15 +17,15 @@ const (
 	defAddr = "tcp://192.168.152.44:1883"
 	//defTopic    = "rbtest"
 	defTopic    = "v1/pm/response"
-	defUsername = "sub1"
-	defPassword = "thtw"
+	defUsername = ""
+	defPassword = ""
 	defClientid = "test-cli-1"
 
 	envAddr     = "MY_ADDR"
 	envTopic    = "MY_TOPIC"
 	envUsername = "MY_USERNAME"
 	envPassword = "MY_PASSWORD"
-	envClientid = "MY_SUBID"
+	envClientid = "MY_CLIENTID"
 )
 
 type config struct {

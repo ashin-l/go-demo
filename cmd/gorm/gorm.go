@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	//_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 const (
@@ -18,8 +19,8 @@ const (
 )
 
 const (
-	START = 1574641380
-	END   = 1574673780
+	START = 1581726307
+	END   = 1581758707
 	DAYS  = 32
 )
 
@@ -40,9 +41,9 @@ type Attendance struct {
 }
 
 func main() {
-	db, err := gorm.Open("mysql", "root:1234.Com@tcp(192.168.152.182:3306)/smart_park")
+	db, err := gorm.Open("postgres", "host=192.168.152.37 port=5432 user=postgres dbname=smart_park password=postgres sslmode=disable")
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect database " + err.Error())
 	}
 	defer db.Close()
 

@@ -1,9 +1,10 @@
 package db
 
-type Database struct {
-	Host string
-	Port string
-	User string
-	Pass string
-	Name string
+type DataSource struct {
+	Host     string
+	Port     string
+	UserName string
+	PassWord string
+	DbName   string
+	Sslmode  string
 }
