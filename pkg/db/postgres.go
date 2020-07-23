@@ -27,5 +27,5 @@ func (m *PostgresDB) First(data interface{}) error {
 }
 
 func (m *PostgresDB) Find(data interface{}) {
-	return m.DB.Find(data)
+	m.DB.Find(data)
 }

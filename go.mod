@@ -3,6 +3,7 @@ module github.com/ashin-l/go-demo
 go 1.13
 
 require (
+	github.com/Shopify/sarama v1.19.0
 	github.com/astaxie/beego v1.12.1
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/giorgisio/goav v0.1.0

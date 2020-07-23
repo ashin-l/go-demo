@@ -14,10 +14,10 @@ import (
 const (
 	defAddr     = "tcp://127.0.0.1:1883"
 	defTopic    = "mytest"
-	defUsername = "admin"
-	defPassword = "thtw"
-	defClientid = "client-test-2"
-	defInterval = "0"
+	defUsername = "xxx"
+	defPassword = "xxx"
+	defClientid = ""
+	defInterval = "3000"
 	defDjson    = `{"ts":%d,"val":"hello world!"}`
 
 	envAddr     = "MY_ADDR"
@@ -63,12 +63,15 @@ func loadConfig() config {
 
 func main() {
 	cfg := loadConfig()
-	fmt.Println("cfg:", cfg)
+	fmt.Printf("%v\n", cfg)
 
 	//create a ClientOptions struct setting the broker address, clientid, turn
 	//off trace output and set the default message handler
 	opts := MQTT.NewClientOptions().AddBroker(cfg.addr)
-	opts.SetClientID(cfg.clientid)
+	if cfg.clientid != "" {
+		opts.SetClientID(cfg.clientid)
+		fmt.Println("clientId: ", cfg.clientid)
+	}
 	opts.SetDefaultPublishHandler(f)
 	opts.SetUsername(cfg.username)
 	opts.SetPassword(cfg.password)
