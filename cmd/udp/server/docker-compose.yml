@@ -1,0 +1,9 @@
+version: '3'
+services:
+  rel:
+    image: godemo/udpserver:1.0
+    container_name: udpserver
+    ports:
+      - 9090:9090/udp
+    volumes:
+      - /etc/localtime:/etc/localtime:ro

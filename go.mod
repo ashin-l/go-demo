@@ -13,7 +13,10 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/jinzhu/gorm v1.9.11
 	github.com/kr/pretty v0.2.0 // indirect
+	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/lestrrat-go/strftime v1.0.3 // indirect
 	github.com/nareix/joy4 v0.0.0-20181022032202-3ddbc8f9d431
+	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	google.golang.org/grpc v1.24.0
 )

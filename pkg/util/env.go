@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -9,7 +8,6 @@ import (
 // fallback is returned.
 func Env(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
-		fmt.Println(v)
 		return v
 	}
 

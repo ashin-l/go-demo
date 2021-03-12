@@ -19,9 +19,9 @@ const (
 )
 
 const (
-	START = 1589156415
-	END   = 1589188995
-	DAYS  = 30
+	START = 1600302024
+	END   = 1600334604
+	DAYS  = 32
 )
 
 type Employee struct {
@@ -41,7 +41,7 @@ type Attendance struct {
 }
 
 func main() {
-	db, err := gorm.Open("postgres", "host=192.168.152.37 port=5432 user=postgres dbname=smart_park password=postgres sslmode=disable")
+	db, err := gorm.Open("postgres", "host=192.168.165.2 port=5432 user=postgres dbname=smart_park password=postgres sslmode=disable")
 	if err != nil {
 		panic("failed to connect database " + err.Error())
 	}
