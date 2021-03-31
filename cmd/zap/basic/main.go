@@ -12,7 +12,9 @@ import (
 
 func main() {
 	// 性能要求不高时使用 SugaredLogger
-	sugar := zap.NewExample().Sugar()
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
 	defer sugar.Sync()
 	sugar.Info("--------  111")
 	sugar.Infow("failed to fetch URL",
@@ -22,7 +24,7 @@ func main() {
 	)
 	sugar.Infof("failed to fetch URL: %s", "http://example.com")
 	// 性能要求高，则使用 Logger
-	logger := zap.NewExample()
+	logger = zap.NewExample()
 	defer logger.Sync()
 	logger.Info("--------  222")
 	logger.Info("failed to fetch URL",
