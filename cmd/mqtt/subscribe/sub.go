@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os/signal"
+	"time"
 
 	//import the Paho Go MQTT library
 	"os"
@@ -39,7 +40,8 @@ type config struct {
 //define a function for the default message handler
 var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("TOPIC: %s\n", msg.Topic())
-	fmt.Printf("MSG: %s\n", msg.Payload())
+	fmt.Printf("MSG SIZE: %d\n", len(msg.Payload()))
+	time.Sleep(4 * time.Second)
 }
 
 func loadConfig() config {
@@ -63,6 +65,7 @@ func main() {
 	opts.SetUsername(cfg.username)
 	opts.SetPassword(cfg.password)
 	opts.SetCleanSession(true)
+	fmt.Println(cfg.username)
 
 	//create and start a client using the above ClientOptions
 	c := MQTT.NewClient(opts)
