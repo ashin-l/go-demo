@@ -12,8 +12,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/ashin-l/go-demo/pkg/log"
-
 	"github.com/ashin-l/go-demo/pkg/util"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
