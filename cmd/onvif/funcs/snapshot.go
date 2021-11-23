@@ -11,8 +11,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"reflect"
-	"strings"
 
 	goonvif "github.com/use-go/onvif"
 	"github.com/use-go/onvif/gosoap"
@@ -20,13 +18,7 @@ import (
 )
 
 func Snapshot(dev *goonvif.Device) {
-	snapurl := media.GetSnapshotUri{}
-	fmt.Println(snapurl)
-
-	pkgPath := strings.Split(reflect.TypeOf(snapurl).PkgPath(), "/")
-	pkg := strings.ToLower(pkgPath[len(pkgPath)-1])
-	fmt.Println(pkg)
-
+	snapurl := media.GetSnapshotUri{ProfileToken: GetProfiles(dev).Token}
 	resp, err := dev.CallMethod(snapurl)
 	sm := gosoap.SoapMessage(readResponse(resp))
 	data := media.GetSnapshotUriResponse{}
@@ -37,11 +29,16 @@ func Snapshot(dev *goonvif.Device) {
 	fmt.Println(data)
 	uri := string(data.MediaUri.Uri)
 	url := uri[:7] + Conf.Username + ":" + Conf.Password + "@" + uri[7:]
+	fmt.Println("url:", url)
 	resp, err = http.Get(url)
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("http请求报错:", resp.Status)
+		return
+	}
 
 	out, err := os.Create("test.jpg")
 	if err != nil {

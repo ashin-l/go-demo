@@ -10,6 +10,7 @@ require (
 	github.com/giorgisio/goav v0.1.0
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
+	github.com/goccy/go-json v0.7.10 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/websocket v1.4.2
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect

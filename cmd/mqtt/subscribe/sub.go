@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os/signal"
+	"strconv"
 	"time"
 
 	//import the Paho Go MQTT library
@@ -10,6 +11,7 @@ import (
 
 	"github.com/ashin-l/go-demo/pkg/util"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/goccy/go-json"
 	//"strconv"
 	//"github.com/astaxie/beego/config"
 )
@@ -21,12 +23,14 @@ const (
 	defUsername = ""
 	defPassword = ""
 	defClientid = "test-cli-1"
+	defQos      = "1"
 
 	envAddr     = "MY_ADDR"
 	envTopic    = "MY_TOPIC"
 	envUsername = "MY_USERNAME"
 	envPassword = "MY_PASSWORD"
 	envClientid = "MY_CLIENTID"
+	envQos      = "MY_QOS"
 )
 
 type config struct {
@@ -35,22 +39,33 @@ type config struct {
 	username string
 	password string
 	clientid string
+	qos      int
 }
 
 //define a function for the default message handler
 var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
-	fmt.Printf("TOPIC: %s\n", msg.Topic())
-	fmt.Printf("MSG SIZE: %d\n", len(msg.Payload()))
-	time.Sleep(4 * time.Second)
+	fmt.Printf("TOPIC: %s, MSGID: %d\n", msg.Topic(), msg.MessageID())
+	data := make(map[string]interface{})
+	json.Unmarshal(msg.Payload(), &data)
+
+	// ts, _ := strconv.ParseInt(data["ts"].(int64), 0, 64)
+	ts := int64(data["ts"].(float64))
+	fmt.Println(time.UnixMilli(ts))
 }
 
 func loadConfig() config {
+	qos, err := strconv.Atoi(util.Env(envQos, defQos))
+	if err != nil {
+		fmt.Println("error", envQos)
+		os.Exit(0)
+	}
 	return config{
 		addr:     util.Env(envAddr, defAddr),
 		topic:    util.Env(envTopic, defTopic),
 		username: util.Env(envUsername, defUsername),
 		password: util.Env(envPassword, defPassword),
 		clientid: util.Env(envClientid, defClientid),
+		qos:      qos,
 	}
 }
 
@@ -66,6 +81,7 @@ func main() {
 	opts.SetPassword(cfg.password)
 	opts.SetCleanSession(true)
 	fmt.Println(cfg.username)
+	fmt.Println(cfg.topic)
 
 	//create and start a client using the above ClientOptions
 	c := MQTT.NewClient(opts)
@@ -74,12 +90,12 @@ func main() {
 		panic(token.Error())
 	}
 
-	if token := c.Subscribe(cfg.topic, 0, nil); token.Wait() && token.Error() != nil {
+	if token := c.Subscribe(cfg.topic, byte(cfg.qos), nil); token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())
 		os.Exit(1)
 	}
-	sigChan := make(chan os.Signal)
-	signal.Notify(sigChan)
-	<-sigChan
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	<-signals
 	c.Disconnect(250)
 }

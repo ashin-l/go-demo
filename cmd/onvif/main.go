@@ -33,7 +33,20 @@ func main() {
 	// funcs.Snapshot(dev)
 
 	// ptz控制:连续移动
-	funcs.ContiMove(dev)
+	// funcs.ContiMove(dev)
+
+	// funcs.GetStatus(dev)
+	// ptz控制:绝对移动
+	funcs.AbsoluteMove(dev)
+
+	// 获取预置点
+	// funcs.GetPreset(dev)
+
+	// 获取ptz状态
+	// funcs.GetStatus(dev)
+
+	// 获取 media.profile
+	// funcs.GetProfile(dev)
 
 	// resp, err := dev.CallMethod(snapurl)
 	// sm := gosoap.SoapMessage(readResponse(resp))

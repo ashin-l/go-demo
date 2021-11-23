@@ -10,7 +10,6 @@ import (
 	"time"
 
 	goonvif "github.com/use-go/onvif"
-	"github.com/use-go/onvif/gosoap"
 	"github.com/use-go/onvif/ptz"
 )
 
@@ -35,12 +34,10 @@ func ContiMove(dev *goonvif.Device) {
 	pcm.Velocity.PanTilt.X = 0.2
 	pcm.ProfileToken = "Profile_1"
 
-	resp, err := dev.CallMethod(&pcm)
+	_, err := dev.CallMethod(&pcm)
 	if err != nil {
 		panic(err)
 	}
-	sm := gosoap.SoapMessage(readResponse(resp))
-	fmt.Println(sm)
 	time.Sleep(3 * time.Second)
 	ps := ptz.Stop{}
 	ps.ProfileToken = "Profile_1"
@@ -48,4 +45,26 @@ func ContiMove(dev *goonvif.Device) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func AbsoluteMove(dev *goonvif.Device) {
+	pf := GetProfiles(dev)
+	pam := ptz.AbsoluteMove{ProfileToken: pf.Token}
+	pam.Position.PanTilt.X = 0.185778
+	pam.Position.PanTilt.Y = 1.00
+	pam.Position.Zoom.X = 0
+	// pam.Position.PanTilt.Space = "http://www.onvif.org/ver10/tptz/PanTiltSpaces/PositionGenericSpace"
+	// pam.Position.Zoom.Space = "http://www.onvif.org/ver10/tptz/ZoomSpaces/PositionGenericSpace"
+	pam.Position.PanTilt.Space = pf.PTZConfiguration.DefaultAbsolutePantTiltPositionSpace
+	pam.Position.Zoom.Space = pf.PTZConfiguration.DefaultAbsoluteZoomPositionSpace
+	pam.Speed.PanTilt.X = 1.0
+	pam.Speed.PanTilt.Y = 1.0
+	// pam.Speed.PanTilt.Space = "http://www.onvif.org/ver10/tptz/PanTiltSpaces/GenericSpeedSpace"
+	fmt.Println("pam:", pam)
+	resp, err := dev.CallMethod(&pam)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(readResponse(resp))
+	time.Sleep(3 * time.Second)
 }

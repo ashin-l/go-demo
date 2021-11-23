@@ -17,6 +17,7 @@ const (
 	defUsername = "xxx"
 	defPassword = "xxx"
 	defClientid = ""
+	defQos      = "1"
 	defInterval = "3000"
 	defDjson    = `{"ts":%d,"val":"hello world!"}`
 
@@ -25,6 +26,7 @@ const (
 	envUsername = "MY_USERNAME"
 	envPassword = "MY_PASSWORD"
 	envClientid = "MY_CLIENTID"
+	envQos      = "MY_QOS"
 	envInterval = "MY_INTERVAL"
 	envDjson    = "MY_DJSON"
 )
@@ -35,6 +37,7 @@ type config struct {
 	username string
 	password string
 	clientid string
+	qos      int
 	interval int
 	djson    string
 }
@@ -45,6 +48,11 @@ var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 }
 
 func loadConfig() config {
+	qos, err := strconv.Atoi(util.Env(envQos, defQos))
+	if err != nil {
+		fmt.Println("error", envQos)
+		os.Exit(0)
+	}
 	iv, err := strconv.Atoi(util.Env(envInterval, defInterval))
 	if err != nil {
 		fmt.Println("error", envInterval)
@@ -56,6 +64,7 @@ func loadConfig() config {
 		username: util.Env(envUsername, defUsername),
 		password: util.Env(envPassword, defPassword),
 		clientid: util.Env(envClientid, defClientid),
+		qos:      qos,
 		interval: iv,
 		djson:    util.Env(envDjson, defDjson),
 	}
@@ -85,36 +94,38 @@ func main() {
 		panic(token.Error())
 	}
 
-	if token := c.Subscribe(cfg.topic, 0, nil); token.Wait() && token.Error() != nil {
-		fmt.Println(token.Error())
-		os.Exit(1)
-	}
+	// if token := c.Subscribe(cfg.topic, 0, nil); token.Wait() && token.Error() != nil {
+	// 	fmt.Println(token.Error())
+	// 	os.Exit(1)
+	// }
 
 	if cfg.interval == 0 {
-		token := c.Publish(cfg.topic, 0, false, cfg.djson)
+		token := c.Publish(cfg.topic, byte(cfg.qos), false, cfg.djson)
 		token.Wait()
-		time.Sleep(10 * time.Second)
+		fmt.Println("down")
 		c.Disconnect(50)
 	} else {
 		exitchan := make(chan struct{})
 		ticker := time.NewTicker(time.Duration(cfg.interval) * time.Millisecond)
 		go func() {
-			sigChan := make(chan os.Signal)
-			signal.Notify(sigChan)
-			<-sigChan
+			signals := make(chan os.Signal, 1)
+			signal.Notify(signals, os.Interrupt)
+			<-signals
 			ticker.Stop()
 			close(exitchan)
 		}()
 		mtime := time.Now().UnixNano() / 1e6
 		//mtime := time.Now().Unix()
+		i := 1
 		for {
 			select {
 			case <-ticker.C:
 				mtime += int64(cfg.interval)
 				payload := fmt.Sprintf(cfg.djson, mtime)
-				token := c.Publish(cfg.topic, 0, false, payload)
+				token := c.Publish(cfg.topic, 1, false, payload)
 				token.Wait()
-				fmt.Println("publish")
+				fmt.Println("publish", i)
+				i++
 			case <-exitchan:
 				c.Disconnect(30)
 				fmt.Println("disconnect!")

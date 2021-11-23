@@ -27,5 +27,6 @@ func readResponse(resp *http.Response) string {
 	if err != nil {
 		panic(err)
 	}
+	resp.Body.Close()
 	return string(b)
 }

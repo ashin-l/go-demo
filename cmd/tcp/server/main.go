@@ -17,8 +17,8 @@ type SensorData struct {
 }
 
 func main() {
-	fmt.Println("server start...")
-	l, err := net.Listen("tcp", "0.0.0.0:8000")
+	fmt.Println("server start, listen on port: 7109")
+	l, err := net.Listen("tcp", "0.0.0.0:7109")
 	if err != nil {
 		fmt.Println("server error: ", err.Error())
 	}
@@ -35,7 +35,6 @@ func main() {
 }
 
 func process(conn net.Conn) {
-	fmt.Println("1111111111111")
 	defer conn.Close()
 	for {
 		buf := make([]byte, 1024)
@@ -47,12 +46,14 @@ func process(conn net.Conn) {
 		fmt.Println("size:", n)
 		fmt.Println("data:", string(buf[:n]))
 		// jstr, _ := json.Marshal(`{"msgType":1,"code":0}`)
-		jstr := []byte(`{"msgType":1,"code":0}`)
-		fmt.Println("len:", len(jstr))
-		jstr = append(jstr, '\n')
-		fmt.Println("jstr", jstr)
-		conn.Write(jstr)
-		fmt.Println("len:", len(jstr))
+		// jstr := []byte(`{"msgType":1,"code":0,"msg":{"uuid":1,"url":"xxx"}}`)
+		// jstr := []byte(`{"msgType":1,"code":0}`)
+		// fmt.Println("len:", len(jstr))
+		// jstr = append(jstr, '\n')
+		// fmt.Println("jstr", jstr)
+		// fmt.Println(string(jstr))
+		// conn.Write(jstr)
+		// fmt.Println("len:", len(jstr))
 		// 气象传感器
 		// sData := SensorData{}
 
