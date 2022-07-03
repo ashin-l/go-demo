@@ -106,7 +106,7 @@ func main() {
 		c.Disconnect(50)
 	} else {
 		exitchan := make(chan struct{})
-		ticker := time.NewTicker(time.Duration(cfg.interval) * time.Millisecond)
+		ticker := time.NewTicker(time.Duration(cfg.interval) * time.Second)
 		go func() {
 			signals := make(chan os.Signal, 1)
 			signal.Notify(signals, os.Interrupt)
@@ -114,8 +114,8 @@ func main() {
 			ticker.Stop()
 			close(exitchan)
 		}()
-		mtime := time.Now().UnixNano() / 1e6
-		//mtime := time.Now().Unix()
+		// mtime := time.Now().UnixNano() / 1e6
+		mtime := time.Now().Unix()
 		i := 1
 		for {
 			select {
