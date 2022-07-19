@@ -6,8 +6,8 @@
 package funcs
 
 import (
-	"fmt"
-
+	"github.com/ashin-l/go-demo/pkg/logger"
+	"github.com/ashin-l/go-demo/pkg/util"
 	goonvif "github.com/use-go/onvif"
 	"github.com/use-go/onvif/gosoap"
 	"github.com/use-go/onvif/ptz"
@@ -19,8 +19,14 @@ func GetPreset(dev *goonvif.Device) {
 	if err != nil {
 		panic(err)
 	}
-	sm := gosoap.SoapMessage(readResponse(resp))
-	fmt.Println(sm)
+
+	bs, err := util.ReadResponse(resp)
+	if err != nil {
+		panic(err)
+	}
+
+	sm := gosoap.SoapMessage(bs)
+	logger.Logger().Info(sm)
 	// data := ptz.GetPresetsResponse{}
 	// err = xml.Unmarshal([]byte(sm.Body()), &data)
 	// if err != nil {

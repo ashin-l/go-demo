@@ -8,8 +8,9 @@ package funcs
 
 import (
 	"encoding/xml"
-	"fmt"
 
+	"github.com/ashin-l/go-demo/pkg/logger"
+	"github.com/ashin-l/go-demo/pkg/util"
 	goonvif "github.com/use-go/onvif"
 	"github.com/use-go/onvif/gosoap"
 	"github.com/use-go/onvif/media"
@@ -43,14 +44,20 @@ func GetProfiles(dev *goonvif.Device) onvif.Profile {
 	if err != nil {
 		panic(err)
 	}
-	sm := gosoap.SoapMessage(readResponse(resp))
 
+	bs, err := util.ReadResponse(resp)
+	if err != nil {
+		panic(err)
+	}
+
+	sm := gosoap.SoapMessage(bs)
 	data := media.GetProfilesResponse{}
 	err = xml.Unmarshal([]byte(sm.Body()), &data)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("profiles: %+v\n", data)
-	fmt.Println("profileToken:", data.Profiles[0].Token)
+
+	logger.Logger().Infof("profiles: %+v\n", data)
+	logger.Logger().Info("profileToken:", data.Profiles[0].Token)
 	return data.Profiles[0]
 }

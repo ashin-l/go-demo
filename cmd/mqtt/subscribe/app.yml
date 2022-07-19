@@ -1,0 +1,15 @@
+logging:
+  # 取值：dubug,info
+  level: info
+  path: logs
+mqtt:
+  addr: tcp://192.168.152.41:1883
+  clientid: go-demo-subscribe
+  username: go-demo-subscribe
+  password: go-demo
+  clean-session: true
+mqtt-topics:
+  - topic: go-demo/test
+    qos: 1
+  - topic: go-demo/test1
+    qos: 1

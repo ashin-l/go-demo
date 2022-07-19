@@ -1,0 +1,40 @@
+logging:
+  # 取值：dubug,info
+  level: info
+  path: logs
+datasource:
+  driver: postgres
+  host: 192.168.162.124
+  port: 5432
+  username: postgres
+  password: postgres
+  dbname: go-demo
+  sslmode: disable
+  # 取值：silent,error,warn,info
+  log-level: info
+kafka:
+  addrs:
+    - 192.168.152.185:9092
+  clientid: go-demo
+  groupid: go-demo
+  topic:
+    device: qinbao.twiot.device
+mqtt:
+  addr: tcp://192.168.152.185:1883
+  clientid: go-demo
+  username: go-demo
+  password: go-demo
+  clean-session: false
+  topic:
+    preset: $queue/camera/preset
+    cruise: $queue/camera/cruise/start
+    cruisestop: camera/cruise/stop
+    # person: v1/person
+minio:
+  endpoint: 192.168.152.181:9000
+  accesskeyid: admin
+  secretaccesskey: thfw2006
+  usessl: false
+  bucketname: test
+  location: cn-north-1
+  prefix: /oss

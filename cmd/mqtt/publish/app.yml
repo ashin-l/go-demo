@@ -1,0 +1,19 @@
+logging:
+  # 取值：dubug,info
+  level: info
+  path: logs
+mqtt:
+  addr: tcp://192.168.152.41:1883
+  clientid: go-demo-publish
+  username: go-demo-publish
+  password: go-demo
+  clean-session: true
+mqtt-topics:
+  - topic: go-demo/test
+    qos: 1
+    fmtstr: '{"id":13332,"attr1":12,"ts":%d}'
+    interval: 5
+  - topic: go-demo/test1
+    qos: 1
+    fmtstr: '{"id":13333,"attr3":32,"ts":%d}'
+    interval: 5

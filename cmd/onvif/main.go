@@ -6,7 +6,12 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/ashin-l/go-demo/cmd/onvif/funcs"
+	"github.com/ashin-l/go-demo/pkg/logger"
+	"github.com/ashin-l/go-demo/pkg/option"
 	"github.com/use-go/onvif"
 )
 
@@ -15,20 +20,20 @@ const (
 	password = "ai123456"
 )
 
-// func readResponse(resp *http.Response) string {
-// 	b, err := ioutil.ReadAll(resp.Body)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return string(b)
-// }
-
 func main() {
-	dev, err := onvif.NewDevice(funcs.Conf.Ip)
+	opt := option.New()
+	err := opt.Parse()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+
+	logger.Init(opt)
+	dev, err := onvif.NewDevice(opt.Camera.Ip)
 	if err != nil {
 		panic(err)
 	}
-	dev.Authenticate(funcs.Conf.Username, funcs.Conf.Password)
+	dev.Authenticate(opt.Camera.Username, opt.Camera.Password)
 	// 抓拍
 	// funcs.Snapshot(dev)
 
@@ -89,5 +94,4 @@ func main() {
 	// 	*/
 	// 	fmt.Println(gosoap.SoapMessage(readResponse(createUserResponse)).StringIndent())
 	// }
-
 }

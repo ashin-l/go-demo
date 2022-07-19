@@ -8,9 +8,10 @@ package funcs
 
 import (
 	"encoding/xml"
-	"fmt"
 
 	"github.com/ashin-l/go-demo/cmd/onvif/model"
+	"github.com/ashin-l/go-demo/pkg/logger"
+	"github.com/ashin-l/go-demo/pkg/util"
 	goonvif "github.com/use-go/onvif"
 	"github.com/use-go/onvif/gosoap"
 	"github.com/use-go/onvif/ptz"
@@ -23,12 +24,18 @@ func GetStatus(dev *goonvif.Device) {
 	if err != nil {
 		panic(err)
 	}
-	sm := gosoap.SoapMessage(readResponse(resp))
 
+	bs, err := util.ReadResponse(resp)
+	if err != nil {
+		panic(err)
+	}
+
+	sm := gosoap.SoapMessage(bs)
 	data := model.GetStatusResponse{}
 	err = xml.Unmarshal([]byte(sm.Body()), &data)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("status: %+v\n\n", data)
+
+	logger.Logger().Infof("status: %+v\n\n", data)
 }

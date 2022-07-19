@@ -6,9 +6,10 @@
 package funcs
 
 import (
-	"fmt"
 	"time"
 
+	"github.com/ashin-l/go-demo/pkg/logger"
+	"github.com/ashin-l/go-demo/pkg/util"
 	goonvif "github.com/use-go/onvif"
 	"github.com/use-go/onvif/ptz"
 )
@@ -38,6 +39,7 @@ func ContiMove(dev *goonvif.Device) {
 	if err != nil {
 		panic(err)
 	}
+
 	time.Sleep(3 * time.Second)
 	ps := ptz.Stop{}
 	ps.ProfileToken = "Profile_1"
@@ -60,11 +62,13 @@ func AbsoluteMove(dev *goonvif.Device) {
 	pam.Speed.PanTilt.X = 1.0
 	pam.Speed.PanTilt.Y = 1.0
 	// pam.Speed.PanTilt.Space = "http://www.onvif.org/ver10/tptz/PanTiltSpaces/GenericSpeedSpace"
-	fmt.Println("pam:", pam)
+	logger.Logger().Info("pam:", pam)
 	resp, err := dev.CallMethod(&pam)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(readResponse(resp))
+
+	bs, _ := util.ReadResponse(resp)
+	logger.Logger().Info(string(bs))
 	time.Sleep(3 * time.Second)
 }
