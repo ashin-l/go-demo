@@ -1,0 +1,10 @@
+logging:
+  # 取值：dubug,info
+  level: info
+  path: logs
+kafka:
+  addrs:
+    - 192.168.161.97:9092
+  clientid: go-demo-publish
+  groupid: go-demo
+  topic: go_demo_test

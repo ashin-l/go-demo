@@ -28,9 +28,7 @@ type Kafka struct {
 	Clientid string
 	Groupid  string
 	Device   string
-	Topic    struct {
-		Device string
-	}
+	Topic    string
 }
 
 type Mqtt struct {

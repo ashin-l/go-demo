@@ -14,6 +14,7 @@ var (
 	c            sarama.Client
 	groupid      string
 	syncProducer sarama.SyncProducer
+	topic        string
 )
 
 type Kafka struct {
@@ -62,12 +63,32 @@ func Init(opt *option.Options) (err error) {
 	//config.Producer.Flush.Bytes = 102400
 	//config.Producer.Partitioner = sarama.NewHashPartitioner
 	c, err = sarama.NewClient(opt.Kafka.Addrs, config)
+	if err != nil {
+		return err
+	}
+	admin, err := sarama.NewClusterAdminFromClient(c)
+	if err != nil {
+		return err
+	}
+	topic = opt.Kafka.Topic
+	err = admin.CreateTopic(topic, &sarama.TopicDetail{
+		NumPartitions:     1,
+		ReplicationFactor: 1,
+	}, false)
+	if err != nil {
+		logger.Logger().Error(err)
+	}
 	groupid = opt.Kafka.Groupid
-	return err
+	return nil
 }
 
 func Stop() error {
 	syncProducer.Close()
+	admin, err := sarama.NewClusterAdminFromClient(c)
+	if err != nil {
+		return err
+	}
+	admin.DeleteTopic(topic)
 	return c.Close()
 }
 
@@ -92,30 +113,6 @@ func Pub(wg *sync.WaitGroup, topic string) (chan []byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("kafka pub error: %s", err)
 	}
-
-	/*
-		fmt.Println("kafka topic", topic)
-		go func() {
-			for {
-				select {
-				case v := <-in:
-					msg := &sarama.ProducerMessage{
-						Topic: topic,
-						Key:   nil,
-					}
-					msg.Value = sarama.ByteEncoder(v)
-					producer.Input() <- msg
-					fmt.Printf("time: %s,topic: %s,msg len: %d\n", time.Now(), topic, msg.Value.Length())
-				case err := <-producer.Errors():
-					fmt.Println("send to kafka error", err)
-				case <-ctx.Done():
-					producer.AsyncClose()
-					fmt.Println("producer close", topic)
-					return
-				}
-			}
-		}()
-	*/
 
 	go func() {
 		wg.Add(1)
