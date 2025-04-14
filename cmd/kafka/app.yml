@@ -8,3 +8,5 @@ kafka:
   clientid: go-demo-publish
   groupid: go-demo
   topic: go_demo_test
+# 消息发送间隔（分钟）
+interval: 1

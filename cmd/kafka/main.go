@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	msg   = "go-demo test msg"
+	msg   = "=== 测试消息 ==="
 )
 
 func HandleMsg(in chan []byte, stop chan struct{}) {
@@ -23,14 +23,13 @@ func HandleMsg(in chan []byte, stop chan struct{}) {
 		for {
 			select {
 			case v := <-in:
-				logger.Logger().Info("接收到kafka消息:", string(v))
+				logger.Logger().Info("收到kafka消息: ", string(v))
 			case <-stop:
-				logger.Logger().Info("停止接收周界数据")
+				logger.Logger().Info("停止接收kafka消息")
 				return
 			}
 		}
 	}()
-
 }
 
 func WaitSignal() {
@@ -65,7 +64,7 @@ func main() {
 		logger.Logger().Error(err)
 		os.Exit(1)
 	}
-	ticker := time.NewTicker(time.Second * 10)
+	ticker := time.NewTicker(time.Minute * time.Duration(opt.Interval))
 	defer ticker.Stop()
 	go func() {
 		for {

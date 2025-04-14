@@ -72,6 +72,7 @@ type Options struct {
 	Minio
 	MqttTopics []MqttTopic `yaml:"mqtt-topics"`
 	Camera
+	Interval int
 }
 
 func New() *Options {

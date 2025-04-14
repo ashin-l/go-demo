@@ -39,7 +39,6 @@ func (h GpHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 func (h GpHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		h.mch[msg.Topic] <- msg.Value
-		logger.Logger().Info(msg.Topic)
 		sess.MarkMessage(msg, "")
 	}
 	return nil
@@ -106,7 +105,6 @@ func PubOne(topic string, val []byte) {
 }
 
 func Pub(wg *sync.WaitGroup, topic string) (chan []byte, error) {
-	//func Pub(ctx context.Context, topic string) (chan []byte, error) {
 	logger.Logger().Info("pub kafka topic: ", topic)
 	in := make(chan []byte)
 	producer, err := sarama.NewAsyncProducerFromClient(c)
@@ -114,8 +112,8 @@ func Pub(wg *sync.WaitGroup, topic string) (chan []byte, error) {
 		return nil, fmt.Errorf("kafka pub error: %s", err)
 	}
 
+	wg.Add(2)
 	go func() {
-		wg.Add(1)
 		for err := range producer.Errors() {
 			logger.Logger().Error("send to kafka error: ", err.Error())
 		}
@@ -124,7 +122,6 @@ func Pub(wg *sync.WaitGroup, topic string) (chan []byte, error) {
 	}()
 
 	go func() {
-		wg.Add(1)
 		for v := range in {
 			msg := &sarama.ProducerMessage{
 				Topic: topic,
@@ -132,7 +129,7 @@ func Pub(wg *sync.WaitGroup, topic string) (chan []byte, error) {
 				Value: sarama.ByteEncoder(v),
 			}
 			producer.Input() <- msg
-			logger.Logger().Infow("send msg success", "topic", topic, "msg_len", msg.Value.Length())
+			logger.Logger().Infow("send msg success", "topic", topic, "msg", string(v))
 		}
 		producer.AsyncClose()
 		logger.Logger().Info(topic, " producer close")
